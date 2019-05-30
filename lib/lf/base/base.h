@@ -1,5 +1,3 @@
-
-
 #ifndef __986f32316282425d9be137cb399482f3
 #define __986f32316282425d9be137cb399482f3
 
@@ -27,7 +25,7 @@ using sub_idx_t = unsigned int;
 /**
  * @brief type for dimensions and co-dimensions and numbers derived from them
  */
-using dim_t = unsigned char;
+using dim_t = unsigned int;
 /**
  * @brief Index flagged as invalid
  */
@@ -40,6 +38,7 @@ constexpr double kPi = 3.14159265358979323846;
 
 // public header files that make up the base library:
 #include "dereference_lambda_random_access_iterator.h"
+#include "eigen_tools.h"
 #include "forward_iterator.h"
 #include "forward_range.h"
 #include "invalid_type_exception.h"

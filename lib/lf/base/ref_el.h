@@ -442,17 +442,20 @@ class RefEl {
 
   /**
    * @brief Return a string representation of this Reference element
+   *
+   * This string is supposed to described  the _topological type_ of the entity:
+   * NODE, EDGE (2 nodes), TRIA (3-node triangle), QUAD (4-node quadrilateral)
    */
   std::string ToString() const {
     switch (type_) {
       case RefElType::kPoint:
-        return "kPoint";
+        return "NODE";
       case RefElType::kSegment:
-        return "kSegment";
+        return "EDGE";
       case RefElType::kTria:
-        return "kTria";
+        return "TRIA";
       case RefElType::kQuad:
-        return "kQuad";
+        return "QUAD";
       default:
         LF_VERIFY_MSG(false, "ToString() not implemented for this RefElType");
     }
@@ -471,13 +474,15 @@ class RefEl {
   /**
    * @brief Return a unique id for this reference element.
    *
+   * The id numbers are contiguous over the known entity types starting from 0.
+   * Thus, this identification number can be used as an array index, if one
+   * wants to store information for (all) type of entities.
+   *
    * #### Usage example
    * @snippet ref_el.cc id
    */
   // NOLINTNEXTLINE(google-explicit-constructor, hicpp-explicit-conversions)
-  constexpr unsigned char Id() const {
-    return static_cast<unsigned char>(type_);
-  }
+  constexpr unsigned int Id() const { return static_cast<unsigned int>(type_); }
 
   ~RefEl() = default;
 

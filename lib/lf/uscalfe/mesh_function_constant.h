@@ -15,10 +15,11 @@
 namespace lf::uscalfe {
 
 /**
+ * @headerfile lf/uscalfe/uscalfe.h
  * @ingroup mesh_function
  * @brief A \ref mesh_function "MeshFunction" which takes the same constant
  * value on the whole mesh.
- * @tparam R The type of the value.
+ * @tparam R The type of the value, must be copyable.
  */
 template <class R>
 class MeshFunctionConstant {
@@ -30,13 +31,16 @@ class MeshFunctionConstant {
    */
   explicit MeshFunctionConstant(R value) : value_(value) {}
 
+  /**
+   * @brief the key evaluation operator to be supplied by all MeshFunctions
+   */
   std::vector<R> operator()(const mesh::Entity& /*unused*/,
-                            const Eigen::MatrixXd& local) {
+                            const Eigen::MatrixXd& local) const {
     return std::vector<R>(local.cols(), value_);
   }
 
  private:
-  R value_;
+  R value_; /**< stored constant value */
 };
 
 }  // namespace lf::uscalfe

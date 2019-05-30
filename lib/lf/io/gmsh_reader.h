@@ -1,3 +1,9 @@
+/***************************************************************************
+ * LehrFEM++ - A simple C++ finite element library for teaching
+ * Developed from 2018 at the Seminar of Applied Mathematics of ETH Zurich,
+ * lead developers Dr. R. Casagrande and Prof. R. Hiptmair
+ ***************************************************************************/
+
 /**
  * @file
  * @brief Declares the class GmshReader
@@ -141,7 +147,7 @@ struct MshFile {
                   //!< the volume)
   };
 
-  /// Contains a list of allement types that are possible.
+  /// Contains a list of all element types that are possible.
   static const std::vector<ElementType> AllElementTypes;
 
   /**
@@ -271,7 +277,7 @@ MshFile readGmshFile(std::string path);
  *   them, make sure you don't tick `Save all (ignore physical groups)` and
  *   make sure that every surface (2d) / volume (3d) belongs to at least one
  *   physical entity.
- *   (Otherwise the corresponding mesh elements are not expored by Gmsh)
+ *   (Otherwise the corresponding mesh elements are not exported by Gmsh)
  * - If you didn't specify any physical entities in Gmsh, you should tick
  *   `Save all (ignore physical groups)`.
  * - The GmshReader doesn't support the options "Save parametric coordinates"
@@ -279,6 +285,21 @@ MshFile readGmshFile(std::string path);
  *
  * #### Sample usage:
  * @snippet gmsh_reader.cc usage
+ *
+ * #### Note about mesh completeness:
+ * In principle, Gmsh can export meshes that are not "complete", i.e. meshes
+ * containing entities with codim>0 that are not sub-entities of cell-entities.
+ * Also, if Gmsh exports a higher-order mesh, it has to introduce
+ * "auxilliary nodes" in order to define the higher-order mesh elements (these
+ * auxilliary nodes are normally placed on edges, faces or in the interior of
+ * cells).
+ *
+ * Since incomplete meshes are usually not useful in a FEM context, GmshReader
+ * doesn't insert into the mesh auxilliary nodes or nodes not belonging to at
+ * least one cell. Auxilliary nodes are however used in the construction of
+ * higher order geometry objects.
+ *
+ *
  *
  */
 class GmshReader {

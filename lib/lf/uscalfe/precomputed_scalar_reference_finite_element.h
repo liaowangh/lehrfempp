@@ -13,21 +13,27 @@
 #include <Eigen/src/Core/util/ForwardDeclarations.h>
 #include <lf/quad/quad.h>
 #include <memory>
-#include "scalar_uniform_fe_space.h"
+#include "uniform_scalar_fe_space.h"
 
 namespace lf::uscalfe {
 
 /**
+ * @headerfile lf/uscalfe/uscalfe.h
  * @brief Helper class which stores a ScalarReferenceFiniteElement with
  * precomputed values at the nodes of a quadrature rule.
- * @tparam SCALAR The scalar type of the shape functions.
+ * @tparam SCALAR The scalar type of the shape functions, e.g. `double`
  *
  * This class does essentially three things:
- * 1. It wraps any ScalarReferenceFiniteElement and forwards all calls to the
+ * -# It wraps any ScalarReferenceFiniteElement and forwards all calls to the
  * wrapped instance.
- * 2. It provides access to a quad::QuadratureRule (passed in constructor)
- * 3. It provides additional member functions to access the precomputed values
- * of the shape functions/gradients at the nodes of the quadrature rule.
+ * -# It provides access to a quad::QuadratureRule (passed in constructor)
+ * -# It provides additional member functions to access the precomputed values
+ * -# the shape functions/gradients at the nodes of the quadrature rule.
+ *
+ * Precomputing entity-independent quantities boost efficiency in the context of
+ * parametric finite element methods provided that a uniform quadrature rule is
+ * used for local computations on all mesh entities of the same topological
+ * type.
  */
 template <class SCALAR>
 class PrecomputedScalarReferenceFiniteElement
@@ -35,7 +41,7 @@ class PrecomputedScalarReferenceFiniteElement
  public:
   /**
    * @brief Default constructor which does not initialize this class at all
-   * (invalid state).
+   * (invalid state). If any method is called upon it, an error is thrown.
    */
   PrecomputedScalarReferenceFiniteElement() = default;
 
@@ -59,6 +65,13 @@ class PrecomputedScalarReferenceFiniteElement
         qr_(std::move(qr)),
         shap_fun_(fe_->EvalReferenceShapeFunctions(qr_.Points())),
         grad_shape_fun_(fe_->GradientsReferenceShapeFunctions(qr_.Points())) {}
+
+  /**
+   * @brief Tells initialization status of object
+   *
+   * An object is in an undefined state when built by the default constructor
+   */
+  inline bool isInitialized() const { return (fe_ != nullptr); }
 
   base::RefEl RefEl() const override {
     LF_ASSERT_MSG(fe_ != nullptr, "Not initialized.");
@@ -134,6 +147,9 @@ class PrecomputedScalarReferenceFiniteElement
 
   /**
    * @brief Value of `EvalGradientsReferenceShapeFunctions(Qr().Weights())`
+   *
+   * See @ref ScalarReferenceFiniteElement::EvalGradientsReferenceShapeFunctions
+   * for the packed format in which the gradients are returned.
    */
   const Eigen::MatrixXd& PrecompGradientsReferenceShapeFunctions() const {
     LF_ASSERT_MSG(fe_ != nullptr, "Not initialized.");
@@ -144,9 +160,14 @@ class PrecomputedScalarReferenceFiniteElement
   ~PrecomputedScalarReferenceFiniteElement() override = default;
 
  private:
+  /** The underlying scalar-valued parametric finite element */
   std::shared_ptr<const ScalarReferenceFiniteElement<SCALAR>> fe_;
+  /** Uniform parametric quadrature rule for the associated type of reference
+   * element */
   quad::QuadRule qr_;
+  /** Holds values of reference shape functions at reference quadrature nodes */
   Eigen::MatrixXd shap_fun_;
+  /** Holds gradients of reference shape functions at quadrature nodes */
   Eigen::MatrixXd grad_shape_fun_;
 };
 
