@@ -30,11 +30,12 @@ configuration:
 
 #Cmake will autodetect the compiler, but we set the arch
 before_build:
-  - cmake -H. -BBuild -A%PLATFORM%
+  - cmake -H. -BBuild -A%PLATFORM% -D HUNTER_CONFIGURATION_TYPES=%CONFIGURATION%
 
 # build with MSBuild
 build:
-  project: Build\ALL_BUILD.vcxproj       # path to Visual Studio solution or project
+  #project: Build\ALL_BUILD.vcxproj       # path to Visual Studio solution or project
+  project: Build\ZERO_CHECK.vcxproj
   parallel: true                        # enable MSBuild parallel builds
   verbosity: normal                     # MSBuild verbosity level {quiet|minimal|normal|detailed}
 
